@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sqlite/database/change_notifier/provider_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:tuple/tuple.dart';
 
 class ChangeNotifierPage extends StatefulWidget {
   const ChangeNotifierPage({super.key});
@@ -31,31 +32,41 @@ class _ChangeNotifierPageState extends State<ChangeNotifierPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Consumer<ProviderController>(
-              builder: (_, controller, __) {
+            Selector<ProviderController, String>(
+              selector: (_, controller) => controller.imgAvatar,
+              builder: (_, imgAvatar, __) {
                 debugPrint('BUILD controller.avatar');
                 return CircleAvatar(
-                    radius: 100,
-                    backgroundImage: NetworkImage(controller.imgAvatar));
+                    radius: 100, backgroundImage: NetworkImage(imgAvatar));
               },
             ),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Consumer<ProviderController>(
-                  builder: (_, controller, __) {
+                Selector<ProviderController, String>(
+                  selector: (_, controller) => controller.name,
+                  builder: (_, name, __) {
                     debugPrint('BUILD controller.name');
-                    return Text(controller.name);
+                    return Text(name);
                   },
                 ),
-                Consumer<ProviderController>(
-                  builder: (_, controller, __) {
+                Selector<ProviderController, String>(
+                  selector: (_, controller) => controller.birthDate,
+                  builder: (_, birthDate, __) {
                     debugPrint('BUILD controller.birthDate');
-                    return Text('(${controller.birthDate})');
+                    return Text('($birthDate)');
                   },
                 ),
               ],
+            ),
+            Selector<ProviderController, Tuple2<String, String>>(
+              selector: (_, controller) =>
+                  Tuple2(controller.birthDate, controller.name),
+              builder: (_, tuple, __) {
+                debugPrint('BUILD controller.birthDate');
+                return Text('(${tuple.item1} - ${tuple.item2})');
+              },
             ),
             ElevatedButton(
               onPressed: () => context.read<ProviderController>().alterarNome(),
